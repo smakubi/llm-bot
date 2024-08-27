@@ -46,15 +46,13 @@ embedding_endpoint_name = f'{user_name}-gte-large-en'
 # COMMAND ----------
 
 #VECTOR SEARCH
-vs_endpoint_name="one-env-shared-endpoint-4" #change back
-# vs_endpoint_name=f'{user_name}-sophinea-rfp-endpoint'
+vs_endpoint_name=f'{user_name}-sophinea-rfp-endpoint'
 vs_index = f'{user_name}_sophinea_rfp_index'
 vs_index_fullname = f"{catalog}.{schema}.{vs_index}"
-sync_table_fullname = f"{catalog}.{schema}.sync_table_name"
 
 # COMMAND ----------
 
 #LLM SERVING
-llm_model_name=f'{user_name}-llama-2-7b-hf-chat'
+llm_model_name=f'{user_name}-llama-3-8b-hf-instruct'
 registered_llm_model_name=f'{catalog}.{schema}.{llm_model_name}'
-llm_endpoint_name = f'{user_name}-llama-2-7b-hf-chat'
+llm_endpoint_name = f'{user_name}-llama-3-8b-hf-instruct'
