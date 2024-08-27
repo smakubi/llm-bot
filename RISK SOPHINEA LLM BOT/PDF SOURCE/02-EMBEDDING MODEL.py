@@ -88,6 +88,63 @@ print(model_version)
 # COMMAND ----------
 
 # MAGIC %md
+# MAGIC ## FUNCTIONS TO MANAGE THE MODEL ENDPOINT
+
+# COMMAND ----------
+# gather other inputs the API needs - they are used as environment variables in the
+serving_host = spark.conf.get("spark.databricks.workspaceUrl")
+creds = get_databricks_host_creds()
+
+#
+def endpoint_exists(serving_endpoint_name):
+  """Check if an endpoint with the serving_endpoint_name exists"""
+  url = f"https://{serving_host}/api/2.0/serving-endpoints/{serving_endpoint_name}"
+  headers = { 'Authorization': f'Bearer {creds.token}' }
+  response = requests.get(url, headers=headers)
+  return response.status_code == 200
+
+# WAIT FOR ENDPOINT TO BE READY
+def wait_for_endpoint(serving_endpoint_name):
+  """Wait until deployment is ready, then return endpoint config"""
+  headers = { 'Authorization': f'Bearer {creds.token}' }
+  endpoint_url = f"https://{serving_host}/api/2.0/serving-endpoints/{serving_endpoint_name}"
+  response = requests.request(method='GET', headers=headers, url=endpoint_url)
+  while response.json()["state"]["ready"] == "NOT_READY" or response.json()["state"]["config_update"] == "IN_PROGRESS" : # if the endpoint isn't ready, or undergoing config update
+    print("Waiting 30s for deployment or update to finish")
+    time.sleep(30)
+    response = requests.request(method='GET', headers=headers, url=endpoint_url)
+    response.raise_for_status()
+  return response.json()
+
+# CREATE A SERVING ENDPOINT
+def create_endpoint(serving_endpoint_name, served_models):
+  """Create serving endpoint and wait for it to be ready"""
+  print(f"Creating new serving endpoint: {serving_endpoint_name}")
+  endpoint_url = f'https://{serving_host}/api/2.0/serving-endpoints'
+  headers = { 'Authorization': f'Bearer {creds.token}' }
+  request_data = {"name": serving_endpoint_name, "config": {"served_models": served_models}}
+  json_bytes = json.dumps(request_data).encode('utf-8')
+  response = requests.post(endpoint_url, data=json_bytes, headers=headers)
+  response.raise_for_status()
+  wait_for_endpoint(serving_endpoint_name)
+  displayHTML(f"""Created the <a href="/#mlflow/endpoints/{serving_endpoint_name}" target="_blank">{serving_endpoint_name}</a> serving endpoint""")
+  
+# UPDATE EXISTING ENDPOINT
+def update_endpoint(serving_endpoint_name, served_models):
+  """Update serving endpoint and wait for it to be ready"""
+  print(f"Updating existing serving endpoint: {serving_endpoint_name}")
+  endpoint_url = f"https://{serving_host}/api/2.0/serving-endpoints/{serving_endpoint_name}/config"
+  headers = { 'Authorization': f'Bearer {creds.token}' }
+  request_data = { "served_models": served_models, "traffic_config": traffic_config }
+  json_bytes = json.dumps(request_data).encode('utf-8')
+  response = requests.put(endpoint_url, data=json_bytes, headers=headers)
+  response.raise_for_status()
+  wait_for_endpoint(serving_endpoint_name)
+  displayHTML(f"""Updated the <a href="/#mlflow/endpoints/{serving_endpoint_name}" target="_blank">{serving_endpoint_name}</a> serving endpoint""")
+
+# COMMAND ----------
+
+# MAGIC %md
 # MAGIC ## CREATING MODEL SERVING ENDPOINT
 
 # COMMAND ----------
@@ -118,62 +175,6 @@ print(deploy_response.json())
 
 # COMMAND ----------
 
-# MAGIC %md
-# MAGIC ## DELETING THE ENDPOINT
-
-# COMMAND ----------
-
-# # Assuming you have the endpoint ID and credentials
-# endpoint_id = deploy_response.json()['id']
-# print(endpoint_id)
-# delete_headers = {'Authorization': f'Bearer {creds.token}', 'Content-Type': 'application/json'}
-# delete_url = f'{workspace_url}/api/2.0/serving-endpoints/{endpoint_id}'
-
-# delete_response = requests.request(method='POST', headers=delete_headers, url=delete_url)
-
-# if delete_response.status_code != 200:
-#   raise Exception(f'Delete failed with status {delete_response.status_code}, {delete_response.text}')
-
-# print("Endpoint deleted successfully")
-
-# COMMAND ----------
-
-# MAGIC %md
-# MAGIC ## OR: MLFLOW DEPLOYMENT SDK
-
-# COMMAND ----------
-
-# from mlflow.deployments import get_deploy_client
-
-# client = get_deploy_client("databricks")
-# client.delete_endpoint(endpoint=embedding_endpoint_name)
-
-# COMMAND ----------
-
-# MAGIC %md
-# MAGIC ## UPDATING THE ENDPOINT
-
-# COMMAND ----------
-
-# # Assuming you have the endpoint ID and credentials
-# endpoint_id = deploy_response.json()['id']
-# update_headers = {'Authorization': f'Bearer {creds.token}', 'Content-Type': 'application/json'}
-# update_url = f'{workspace_url}/api/2.0/serving-endpoints/{endpoint_id}'
-
-# # Configuration to update the endpoint
-# update_config = {
-#   "config": {
-#     "scale_to_zero_enabled": True
-#   }
-# }
-# update_response = requests.request(method='POST', headers=update_headers, url=update_url, data=json.dumps(update_config))
-
-# if update_response.status_code != 200:
-#   raise Exception(f'Update failed with status {update_response.status_code}, {update_response.text}')
-
-# print("Endpoint updated successfully:", update_response.json())
-
-# COMMAND ----------
 
 # MAGIC %md
 # MAGIC ## PREPARE DATA FOR QUERY
@@ -189,17 +190,24 @@ print(data_json)
 
 # COMMAND ----------
 
+# MAGIC %md
+# MAGIC ## TEST ENDPOINT
+
+# COMMAND ----------
 # testing endpoint
-invoke_headers = {'Authorization': f'Bearer {creds.token}', 'Content-Type': 'application/json'}
-invoke_url = f'{workspace_url}/serving-endpoints/{embedding_endpoint_name}/invocations'
-print(invoke_url)
+if endpoint_exists(embedding_endpoint_name):
+    invoke_headers = {'Authorization': f'Bearer {creds.token}', 'Content-Type': 'application/json'}
+    invoke_url = f'{workspace_url}/serving-endpoints/{embedding_endpoint_name}/invocations'
 
-start = time.time()
-invoke_response = requests.request(method='POST', headers=invoke_headers, url=invoke_url, data=data_json, timeout=360)
-end = time.time()
-print(f'time in seconds: {end-start}')
+    start = time.time()
+    invoke_response = requests.request(method='POST', headers=invoke_headers, url=invoke_url, data=data_json, timeout=360)
+    end = time.time()
 
-if invoke_response.status_code != 200:
-  raise Exception(f'Request failed with status {invoke_response.status_code}, {invoke_response.text}')
+    if invoke_response.status_code != 200:
+        raise Exception(f'Request failed with status {invoke_response.status_code}, {invoke_response.text}')
+    else:
+        print(invoke_response.text)
+else:
+    wait_for_endpoint(embedding_endpoint_name)
 
-print(invoke_response.text)
+# COMMAND ----------
