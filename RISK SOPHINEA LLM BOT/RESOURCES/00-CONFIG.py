@@ -15,7 +15,7 @@ hf_token = ""
 # COMMAND ----------
 
 #GENERAL
-user_name = dbutils.notebook.entry_point.getDbutils().notebook().getContext().userName().get().split(".")[0]
+user_name = dbutils.notebook.entry_point.getDbutils().notebook().getContext().userName().get().split("@")[0]
 catalog = 'llm_workshop'
 dbName = db = schema = f'{user_name}_rfp'
 volume_name = 'rfp'
