@@ -195,7 +195,9 @@ print(data_json)
 
 # COMMAND ----------
 # testing endpoint
-if endpoint_exists(embedding_endpoint_name):
+if not endpoint_exists(embedding_endpoint_name):
+    wait_for_endpoint(embedding_endpoint_name)
+else:
     invoke_headers = {'Authorization': f'Bearer {creds.token}', 'Content-Type': 'application/json'}
     invoke_url = f'{workspace_url}/serving-endpoints/{embedding_endpoint_name}/invocations'
 
@@ -207,7 +209,5 @@ if endpoint_exists(embedding_endpoint_name):
         raise Exception(f'Request failed with status {invoke_response.status_code}, {invoke_response.text}')
     else:
         print(invoke_response.text)
-else:
-    wait_for_endpoint(embedding_endpoint_name)
 
 # COMMAND ----------
