@@ -54,7 +54,6 @@ login(token=hf_token)
 # COMMAND ----------
 
 model_id = "meta-llama/Meta-Llama-3.1-8B-Instruct"
-#model_id = "meta-llama/Meta-Llama-3.1-8B-Instruct"
 revision = "5206a32e0bd3067aef1ce90f5528ade7d866253f"
 snapshot_location = snapshot_download(repo_id=model_id, revision=revision, cache_dir="/local_disk0/.cache/huggingface/", ignore_patterns=["*.bin"])
 
@@ -261,13 +260,12 @@ def update_endpoint(serving_endpoint_name, served_models):
 
 #GPU Serving of UC pyfunc model
 # This will take time to complete 45 minutes. Don't run again after its created
-llm_endpoint_name = "new-testimg"
 served_models = [
     {
       "name": llm_model_name,
       "model_name": registered_llm_model_name,
       "model_version": model_version,
-      "workload_size": "Small",
+      "workload_size": "Medium",
       "workload_type": "GPU_MEDIUM",
       "scale_to_zero_enabled": False
     }
