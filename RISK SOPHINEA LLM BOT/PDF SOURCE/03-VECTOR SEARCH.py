@@ -33,9 +33,9 @@ vsc = VectorSearchClient()
 # CREATE THE VECTOR SEARCH ENDPOINT. THIS WILL TAKE 15 MINS
 if not endpoint_exists(vsc, vs_endpoint_name):
     vsc.create_endpoint(name=vs_endpoint_name, endpoint_type="STANDARD")
-
-wait_for_vs_endpoint_to_be_ready(vsc, vs_endpoint_name)
-print(f"Endpoint named {vs_endpoint_name} is ready.")
+    wait_for_vs_endpoint_to_be_ready(vsc, vs_endpoint_name)
+else:
+    print(f"Endpoint named {vs_endpoint_name} is ready.")
 
 # COMMAND ----------
 
