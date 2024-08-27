@@ -72,6 +72,7 @@ import warnings
 import io
 import re
 from pypdf import PdfReader
+import requests
 
 def parse_bytes_pypdf(raw_doc_contents_bytes: bytes):
     try:
