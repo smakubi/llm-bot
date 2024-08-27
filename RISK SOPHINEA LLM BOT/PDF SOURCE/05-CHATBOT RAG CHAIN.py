@@ -359,4 +359,4 @@ print(f"Share this URL with your stakeholders: {deployment_info.review_app_url}"
 # MAGIC
 # MAGIC To solve these issue, we need a repeatable way of testing our model answer as part of our LLMOps deployment!
 # MAGIC
-# MAGIC Open the next [03-OFFLINE-EVALUATION]($./03-OFFLINE-EVALUATION) notebook to discover how to evaluate your model.
+# MAGIC Open the next [03-OFFLINE EVALUATION]($./03-OFFLINE EVALUATION) notebook to discover how to evaluate your model.
