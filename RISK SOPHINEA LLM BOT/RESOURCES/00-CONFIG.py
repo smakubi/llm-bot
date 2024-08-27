@@ -10,7 +10,7 @@
 # COMMAND ----------
 
 # HUGGING FACE TOKEN
-hf_token = "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"
+hf_token = ""
 
 # COMMAND ----------
 
