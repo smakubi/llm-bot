@@ -274,11 +274,3 @@ pprint(docs)
 
 # COMMAND ----------
 
-# MAGIC %md 
-# MAGIC ## NEXT STEP DEPLOY CHATBOT MODEL WITH RAG
-# MAGIC
-# MAGIC We've seen how Databricks Lakehouse AI makes it easy to ingest and prepare your documents, and deploy a Self Managed Vector Search index on top of it with just a few lines of code and configuration.
-# MAGIC
-# MAGIC This simplifies and accelerates your data projects so that you can focus on the next step: creating your realtime chatbot endpoint with well-crafted prompt augmentation.
-# MAGIC
-# MAGIC Open the [04-ADVANCED-CHATBOT-CHAIN]($./04-ADVANCED-CHATBOT-CHAIN) notebook to create and deploy a chatbot endpoint.
