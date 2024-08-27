@@ -207,9 +207,6 @@ display(spark.sql("SELECT * FROM sophinea_pdf_documentation WHERE url like '%.pd
 
 # COMMAND ----------
 
-# MAGIC %md
-# MAGIC ## CREATING VECTOR SEARCH ENDPOINT
-
 # COMMAND ----------
 
 # MAGIC %md
