@@ -266,7 +266,7 @@ served_models = [
       "model_name": registered_llm_model_name,
       "model_version": model_version,
       "workload_size": "Medium",
-      "workload_type": "GPU_MEDIUM",
+      "workload_type": "MULTIGPU_MEDIUM",
       "scale_to_zero_enabled": False
     }
 ]
