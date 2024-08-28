@@ -53,7 +53,7 @@ rag_chain_config = {
         "llm_prompt_template_variables": ["context", "question"],
     },
     "retriever_config": {
-        "embedding_model": "samwel-gte-large-en", # RECHECK
+        "embedding_model": embedding_model_name, # RECHECK
         "chunk_template": "Passage: {chunk_text}\n",
         "data_pipeline_tag": "poc",
         "parameters": {"k": 3, "query_type": "ann"},
