@@ -278,6 +278,7 @@ if not endpoint_exists(llm_endpoint_name):
 else:
   update_endpoint(llm_endpoint_name, served_models)
 
+# COMMAND ----------
 # MAGIC %md 
 # MAGIC ## NEXT STEP DEPLOY CHATBOT MODEL WITH RAG
 # MAGIC
