@@ -159,7 +159,7 @@ endpoint_config = {
       "name": f'{embedding_model_name}',
       "model_name": registered_embedding_model_name,
       "model_version": model_version,
-      "workload_type": "GPU_MEDIUM", # NEED FASTER SERVING FOR VECTOR SEARCH
+      "workload_type": "MULTIGPU_MEDIUM", # NEED FASTER SERVING FOR VECTOR SEARCH
       "workload_size": "Medium", # CHANGE TO MEDIUM
       "scale_to_zero_enabled": False,
     }]
